@@ -1,12 +1,12 @@
 import fs from 'fs';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-static';
 
 type SortType = 'DASC' | 'FASC' | 'FDESC';
 
 export async function GET(request: NextRequest) {
-  const sortType = request.nextUrl.search || 'DASC';
+  const sortType = request.headers.get('sortType') || 'DASC';
   const sort = sortType as SortType;
   const parsedData: { date: string; filename: string }[] = [];
 
@@ -29,7 +29,12 @@ export async function GET(request: NextRequest) {
     // filename descending sort
     parsedData.sort((a, b) => compareFileName(b.filename, a.filename));
   }
-  return Response.json({ parsedData });
+
+  const response = NextResponse.json({ parsedData });
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, sortType');
+  return response;
 }
 
 function compareFileName(a: string, b: string) {
