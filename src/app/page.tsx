@@ -39,8 +39,9 @@ export default function Home() {
         } else {
           setItems(data.parsedData);
         }
-      } catch (e: any) {
-        setError(e.message || 'An error occurred');
+      } catch (e) {
+        console.error(e);
+        setError('An error occurred');
       } finally {
         setIsLoading(false);
       }
